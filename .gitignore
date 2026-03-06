@@ -24,6 +24,24 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 
+# Archives
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+*.playground/
+
+# Provisioning
+*.mobileprovision
+
+# Code coverage
+*.gcno
+*.gcda
+codecov.yml
+
 # OS files
 .DS_Store
 .DS_Store?
@@ -37,6 +55,7 @@ Thumbs.db
 *.swo
 *~
 .idea/
+.vscode/
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -46,26 +65,55 @@ Thumbs.db
 *.perspectivev3
 !default.perspectivev3
 
-# Playgrounds
-timeline.xctimeline
-playground.xcworkspace
-
-# Archives
-*.ipa
-*.dSYM.zip
-*.dSYM
-
-# Swift Playgrounds
-*.playground/
-
-# Provisioning
-*.mobileprovision
-
-# Code coverage
-*.gcno
-*.gcda
-codecov.yml
+# Claude Code local settings
+.claude/
 
 # Environment
 .env
 .env.*
+
+# Databases
+*.sqlite
+*.sqlite3
+*.db
+*.mdb
+*.accdb
+*.realm
+*.coredata
+
+# Large files
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+*.dmg
+*.iso
+*.pkg
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.mp3
+*.wav
+*.flac
+*.aac
+
+# Office documents
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+*.odt
+*.ods
+*.odp
+*.rtf
+*.csv
+*.tsv
+*.pdf
+*.pages
+*.numbers
+*.key

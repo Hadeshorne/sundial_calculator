@@ -2,69 +2,95 @@
 
 ## Project Overview
 
-Sundial Calculator is a visual, Montessori-informed iPhone calculator for people with dyscalculia. It provides dual-output (symbolic + visual) computation with an emphasis on meaning, error resistance, and accessibility.
+Sundial Calculator is a dual-output calculator available on macOS (built) and iOS (planned). The macOS version targets senior executive knowledge workers. It provides symbolic + visual computation with emphasis on meaning verification, cognitive load reduction, and accessibility. Grounded in Montessori-informed design research (see `Calculator_Research.md`).
 
-## Architecture
+## Current State
 
-- **Platform**: iOS (iPhone)
-- **UI Framework**: SwiftUI (app shell) + SwiftUI Canvas (visual rendering) + UIKit interop (complex gestures)
-- **Storage**: Core Data (local-first), optional CloudKit sync
-- **Pattern**: Modular — computation engine, visual renderer(s), interaction layer, accessibility adapter
+**macOS app (active)**: Built with SwiftUI via Swift Package Manager. Fully functional compute-mode calculator with visual answer panel, history sidebar, keyboard-first interaction. 134 automated tests across 25 suites, all passing.
+
+**iOS app (planned)**: Future work. See `Calculator_Research.md` for full design spec.
+
+## Architecture (macOS)
+
+- **Platform**: macOS 14+
+- **UI Framework**: SwiftUI + SwiftUI Canvas (visual rendering)
+- **Build**: Swift Package Manager (`swift build` / `swift run` / `swift test`)
+- **Pattern**: MVVM — `CalculatorViewModel` drives all state, `CalculatorEngine` is pure computation
 
 ## Key Design Constraints
 
-- **Montessori principles are engineering constraints**, not decoration:
-  - Concrete-to-abstract progression
-  - Sensorial (perceptual, tappable, draggable) materials
-  - Self-correction / control of error built into the UI
-  - Freedom within limits (bounded choices: 2–3 visual options per operation)
-  - Limit the field of consciousness (progressive disclosure)
-- **Cognitive load reduction** is a product requirement, not a nice-to-have
-- **Accessibility is non-negotiable**: VoiceOver, Dynamic Type, contrast, Dark Mode, Reduced Motion, 44pt touch targets
+- **Montessori principles as engineering constraints**:
+  - Concrete-to-abstract: visual verification shows meaning behind numbers
+  - Control of error: visual sanity checks catch order-of-magnitude mistakes
+  - Freedom within limits: choose from 3 visual answer types
+  - Limit field of consciousness: progressive disclosure, clean UI
+- **Cognitive load reduction** is a product requirement
+- **Accessibility**: VoiceOver labels on all interactive elements, keyboard navigation, Dark Mode
 
-## Two Modes
+## Features (macOS)
 
-- **Compute mode** (default): fast entry, instant result, compact visual check
-- **Construct mode**: interactive manipulatives with control-of-error feedback
-
-## Visual Answer Types
-
-- Number line (animated jumps with step controls)
-- Manipulatives (base-ten blocks / bead units)
-- Dot patterns (ten-frames, canonical dot cards)
-- Arrays / area models
-- Color-coded place value (with non-color fallbacks)
-- Step-by-step animated constructions
+- Expression-based input with full operator precedence (PEMDAS) and parentheses
+- Six operations: +, −, ×, ÷, ^ (power), √ (square root)
+- Percentage — standalone (`50%` = 0.5) and contextual (`200 + 10%` = 220)
+- Toggle sign (±)
+- Memory functions (M+, M−, MR, MC)
+- Visual answer panel: Number Line, Place Value Breakdown, Proportion Bar
+- Calculation history sidebar with click-to-recall
+- Full keyboard support (digits, operators, ^, Enter, Escape, Delete)
+- Menu bar with Cmd shortcuts
+- Dark Mode and Light Mode
+- Error recovery: all input methods (digits, operators, %, ^, √, ±) clear broken expression after error
+- Domain validation: √(negative), negative^fractional, overflow → `undefinedResult` error
+- IEEE 754 display: floating-point noise eliminated (e.g., 0.1+0.2 shows "0.3"); integers display without scientific notation
 
 ## Code Style
 
-- Swift, following Apple's Swift API Design Guidelines
-- SwiftUI-first, UIKit only when needed for performance or gesture complexity
+- Swift 5.9+, Apple's Swift API Design Guidelines
+- SwiftUI-first
+- `@Observable` for state management
 - Accessibility modifiers on every interactive element
-- Test at accessibility text sizes and with VoiceOver before merging
+- Swift Testing framework for unit tests
 
-## File Structure (planned)
+## File Structure
 
 ```
-SundialCalculator/
-├── App/                    # App entry point, main scenes
-├── Models/                 # Data models, computation engine
+Sources/SundialCalculator/
+├── SundialCalculatorApp.swift          # @main App entry point, menu commands
+├── Models/
+│   ├── CalculatorEngine.swift          # Tokenizer, shunting-yard parser, evaluator
+│   └── CalculationRecord.swift         # History entry model
+├── ViewModels/
+│   └── CalculatorViewModel.swift       # Main state, input handling, memory, history
 ├── Views/
-│   ├── Calculator/         # Keypad, expression display, result
-│   ├── VisualAnswers/      # Number line, manipulatives, dot patterns, etc.
-│   └── Settings/           # Preferences, accessibility options
-├── ViewModels/             # State management
-├── Services/               # Storage, CloudKit sync, haptics
-├── Accessibility/          # VoiceOver helpers, custom actions
-└── Resources/              # Assets, localization
+│   ├── ContentView.swift               # HSplitView layout, keyboard handlers
+│   ├── DisplayView.swift               # Expression + result display
+│   ├── KeypadView.swift                # Button grid with CalcButtonStyle
+│   └── HistoryView.swift               # Sidebar with history entries
+└── VisualAnswers/
+    ├── VisualAnswerView.swift           # Visual type picker + container
+    ├── NumberLineView.swift             # Canvas-based number line
+    ├── BreakdownView.swift              # Place value decomposition
+    └── ProportionBarView.swift          # Proportion/percentage bars
+
+Tests/SundialCalculatorTests/
+├── CalculatorEngineTests.swift          # 20 engine unit tests
+├── UserScenarioTests.swift             # 87 user scenario tests (18 use cases)
+└── QualityGapTests.swift               # 27 quality gap tests (6 suites)
 ```
 
 ## Development Workflow
 
+- `swift build` — compile
+- `swift test` — run all 134 automated tests
+- `swift run` — launch the app
 - Run tests before committing
-- Test accessibility (VoiceOver, Dynamic Type, Reduced Motion) for any UI change
-- Keep visual renderers as interchangeable modules that all obey the truth constraint: visual model must match computed result
+- Test with VoiceOver and in Dark Mode for any UI change
+- Visual renderers must match computed result (truth constraint)
 
-## Reference
+## Key Files
 
-See `deep-research-report.md` for the full design research document including evidence base, wireframes, evaluation plan, and roadmap.
+- `Calculator_Research.md` — Full design research document
+- `EXECUTION_PLAN.md` — Build execution plan with progress tracking
+- `TEST_PLAN.md` — Comprehensive test plan
+- `CHEATSHEET.md` — User manual for first-time users
+- `Package.swift` — SPM project definition

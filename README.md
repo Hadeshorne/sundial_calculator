@@ -1,59 +1,112 @@
 # Sundial Calculator
 
-A visual, Montessori-informed iPhone calculator designed for people with dyscalculia.
+A dual-output calculator for macOS that pairs every numeric result with a visual sanity check. Built for senior executive knowledge workers who need fast, accurate calculation with instant visual verification.
 
-## Overview
+## Quick Start
 
-Standard calculators return symbols, but many people with dyscalculia need **meaning** and **error resistance** as much as they need speed. Sundial Calculator provides a dual-output experience:
+```bash
+# Build
+swift build
 
-- **Symbolic output** — the expression and numeric result, always available
-- **Visual output** — a "visual answer" that shows the same result through quantity, structure, and magnitude (number line jumps, place-value blocks, dot patterns, arrays, area models, and step-by-step constructions)
+# Run
+swift run
+
+# Test
+swift test
+```
+
+Requires: macOS 14+ and Xcode Command Line Tools (Swift 5.9+).
+
+## Features
+
+### Compute Mode
+- **Expression input** — type full expressions like `(100 + 50) × 2 ÷ 3`
+- **Operator precedence** — correct PEMDAS/BODMAS order of operations
+- **Parentheses** — group sub-expressions
+- **Power** — `5^2` = 25, `1.05^10` ≈ 1.629 (compound interest)
+- **Square root** — `√144` = 12, `√25 + 3` = 8
+- **Percentage** — standalone (`50%` = 0.5) and contextual (`200 + 10%` = 220)
+- **Memory** — M+, M−, MR, MC for running totals
+
+### Visual Answer Panel
+Every result includes an optional visual check — choose from:
+- **Number Line** — shows operands and result on a scaled line with jump arcs
+- **Place Value** — decomposes results into thousands, hundreds, tens, ones with color-coded blocks
+- **Proportion** — bar visualization showing how operands compose the result
+
+### History Sidebar
+- All calculations saved in session
+- Click any entry to recall it
+- Newest first
+
+### Keyboard-First Design
+| Key | Action |
+|-----|--------|
+| 0–9, . | Enter digits |
+| +, -, *, / | Operators |
+| ^ | Power (exponent) |
+| ( ) | Parentheses |
+| % | Percentage |
+| Enter or = | Evaluate |
+| Escape | Clear |
+| Delete | Backspace |
+| Cmd+C | Copy result |
+| Cmd+Shift+V | Toggle visual panel |
+| Cmd+Shift+C | Clear expression |
+
+### Accessibility
+- VoiceOver labels on all interactive elements
+- Full keyboard navigation
+- Dark Mode and Light Mode support
+- High-contrast button styling
 
 ## Design Principles
 
-Grounded in Montessori pedagogy and dyscalculia research:
+Grounded in [Montessori-informed design research](Calculator_Research.md):
 
-- **Concrete-to-abstract progression** — start with quantity and structure, move to symbols when ready
-- **Sensorial materials** — tappable, draggable manipulatives with spatial grouping and tactile cues
-- **Self-correction (control of error)** — snap-to-place-value bins, regrouping rules, and inconsistency cues
-- **Freedom within limits** — 2–3 visual options per operation, user-controlled pace, capped overlays
-- **Reduce cognitive load** — progressive disclosure, user-paced steps, minimal motion
+- **Visual verification** — every result can be visually checked for magnitude and structure
+- **Cognitive load reduction** — clean UI, progressive disclosure, no clutter
+- **Control of error** — visual answers help catch order-of-magnitude mistakes
+- **Freedom within limits** — choose from 3 visual types, not an overwhelming list
 
-## Modes
+## Architecture
 
-- **Compute mode** (default) — fast entry, instant answer, compact visual check
-- **Construct mode** (optional) — drag, group, and step through representations with control-of-error feedback
+- SwiftUI macOS app built with Swift Package Manager
+- MVVM pattern: `CalculatorViewModel` → `CalculatorEngine`
+- Pure Swift computation engine (no UI dependencies, fully unit-tested)
+- Visual renderers are interchangeable SwiftUI views
+- 134 automated tests across 25 suites
 
-## Accessibility
+## Project Structure
 
-Non-negotiable accessibility support:
+```
+Sources/SundialCalculator/
+├── SundialCalculatorApp.swift      # App entry point
+├── Models/                         # Engine + data models
+├── ViewModels/                     # State management
+├── Views/                          # UI components
+└── VisualAnswers/                  # Visual renderers
+Tests/SundialCalculatorTests/       # 134 automated tests
+```
 
-- VoiceOver with custom actions for manipulatives
-- Dynamic Type / Larger Text
-- Sufficient contrast and color independence
-- Dark Mode
-- Reduced Motion alternatives
-- 44pt minimum touch targets
+## Testing
 
-## Tech Stack
+See [TEST_PLAN.md](TEST_PLAN.md) for the comprehensive test plan.
 
-- SwiftUI app shell
-- SwiftUI Canvas for visual rendering
-- UIKit interop for complex gesture workspaces (as needed)
-- Core Data for local-first storage
-- Optional CloudKit sync (private database, encrypted fields)
+```bash
+swift test   # Runs 134 automated tests across 25 suites
+swift run    # Launch app for manual testing
+```
 
-## Roadmap
+## Documentation
 
-| Phase | Focus |
-|-------|-------|
-| **MVP** | 4 operations, expression entry, history, one default visual per operation, full accessibility baseline, local-first |
-| **v1** | Visual chooser (2–3 per operation), manipulatives, dot patterns, onboarding personalization |
-| **v2** | Full Construct mode, guided step-by-step constructions, optional CloudKit sync, practice sets |
+- [CHEATSHEET.md](CHEATSHEET.md) — User manual for first-time users
+- [TEST_PLAN.md](TEST_PLAN.md) — Comprehensive test plan
+- [EXECUTION_PLAN.md](EXECUTION_PLAN.md) — Build execution plan
 
-## Privacy
+## Future: iOS Version
 
-Local-first by default. No accounts required. Optional opt-in cloud sync with encrypted data at rest.
+An iOS version targeting dyscalculia support is planned with interactive manipulatives, Construct mode, and Core Data storage. See `Calculator_Research.md` for the full design specification.
 
 ## License
 
