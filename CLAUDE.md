@@ -6,7 +6,7 @@ Sundial Calculator is a dual-output calculator available on macOS (built) and iO
 
 ## Current State
 
-**macOS app (active)**: Built with SwiftUI via Swift Package Manager. Fully functional compute-mode calculator with visual answer panel, history sidebar, keyboard-first interaction. 134 automated tests across 25 suites, all passing.
+**macOS app (active)**: Built with SwiftUI via Swift Package Manager. Fully functional compute-mode calculator with visual answer panel, history sidebar, keyboard-first interaction. 141 automated tests across 26 suites, all passing.
 
 **iOS app (planned)**: Future work. See `Calculator_Research.md` for full design spec.
 
@@ -22,7 +22,7 @@ Sundial Calculator is a dual-output calculator available on macOS (built) and iO
 - **Montessori principles as engineering constraints**:
   - Concrete-to-abstract: visual verification shows meaning behind numbers
   - Control of error: visual sanity checks catch order-of-magnitude mistakes
-  - Freedom within limits: choose from 3 visual answer types
+  - Freedom within limits: choose from 6 visual answer types
   - Limit field of consciousness: progressive disclosure, clean UI
 - **Cognitive load reduction** is a product requirement
 - **Accessibility**: VoiceOver labels on all interactive elements, keyboard navigation, Dark Mode
@@ -34,7 +34,7 @@ Sundial Calculator is a dual-output calculator available on macOS (built) and iO
 - Percentage — standalone (`50%` = 0.5) and contextual (`200 + 10%` = 220)
 - Toggle sign (±)
 - Memory functions (M+, M−, MR, MC)
-- Visual answer panel: Number Line, Place Value Breakdown, Proportion Bar
+- Visual answer panel: Number Line, Place Value Breakdown, Proportion Bar, Order of Magnitude, Factor Ratio, Area Grid
 - Calculation history sidebar with click-to-recall
 - Full keyboard support (digits, operators, ^, Enter, Escape, Delete)
 - Menu bar with Cmd shortcuts
@@ -70,18 +70,21 @@ Sources/SundialCalculator/
     ├── VisualAnswerView.swift           # Visual type picker + container
     ├── NumberLineView.swift             # Canvas-based number line
     ├── BreakdownView.swift              # Place value decomposition
-    └── ProportionBarView.swift          # Proportion/percentage bars
+    ├── ProportionBarView.swift          # Proportion/percentage bars
+    ├── OrderOfMagnitudeView.swift       # Logarithmic magnitude scale
+    ├── FactorRatioView.swift            # Factor/ratio comparison bars
+    └── AreaGridView.swift               # Grid visualization for ×/÷/^
 
 Tests/SundialCalculatorTests/
 ├── CalculatorEngineTests.swift          # 20 engine unit tests
-├── UserScenarioTests.swift             # 87 user scenario tests (18 use cases)
+├── UserScenarioTests.swift             # 94 user scenario tests (19 use cases)
 └── QualityGapTests.swift               # 27 quality gap tests (6 suites)
 ```
 
 ## Development Workflow
 
 - `swift build` — compile
-- `swift test` — run all 134 automated tests
+- `swift test` — run all 141 automated tests
 - `swift run` — launch the app
 - Run tests before committing
 - Test with VoiceOver and in Dark Mode for any UI change

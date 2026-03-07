@@ -29,10 +29,13 @@ Requires: macOS 14+ and Xcode Command Line Tools (Swift 5.9+).
 - **Memory** — M+, M−, MR, MC for running totals
 
 ### Visual Answer Panel
-Every result includes an optional visual check — choose from:
+Every result includes an optional visual check — choose from six types:
 - **Number Line** — shows operands and result on a scaled line with jump arcs
 - **Place Value** — decomposes results into thousands, hundreds, tens, ones with color-coded blocks
 - **Proportion** — bar visualization showing how operands compose the result
+- **Magnitude** — logarithmic scale showing where numbers fall across orders of magnitude
+- **Factor** — side-by-side bars with ratio annotations and percentage change
+- **Area** — grid visualization for multiplication, division, and power operations
 
 ### History Sidebar
 - All calculations saved in session
@@ -67,7 +70,7 @@ Grounded in [Montessori-informed design research](Calculator_Research.md):
 - **Visual verification** — every result can be visually checked for magnitude and structure
 - **Cognitive load reduction** — clean UI, progressive disclosure, no clutter
 - **Control of error** — visual answers help catch order-of-magnitude mistakes
-- **Freedom within limits** — choose from 3 visual types, not an overwhelming list
+- **Freedom within limits** — choose from 6 visual types, each suited to different operations
 
 ## Architecture
 
@@ -75,7 +78,7 @@ Grounded in [Montessori-informed design research](Calculator_Research.md):
 - MVVM pattern: `CalculatorViewModel` → `CalculatorEngine`
 - Pure Swift computation engine (no UI dependencies, fully unit-tested)
 - Visual renderers are interchangeable SwiftUI views
-- 134 automated tests across 25 suites
+- 141 automated tests across 26 suites
 
 ## Project Structure
 
@@ -86,7 +89,7 @@ Sources/SundialCalculator/
 ├── ViewModels/                     # State management
 ├── Views/                          # UI components
 └── VisualAnswers/                  # Visual renderers
-Tests/SundialCalculatorTests/       # 134 automated tests
+Tests/SundialCalculatorTests/       # 141 automated tests
 ```
 
 ## Testing
@@ -94,7 +97,7 @@ Tests/SundialCalculatorTests/       # 134 automated tests
 See [TEST_PLAN.md](TEST_PLAN.md) for the comprehensive test plan.
 
 ```bash
-swift test   # Runs 134 automated tests across 25 suites
+swift test   # Runs 141 automated tests across 26 suites
 swift run    # Launch app for manual testing
 ```
 

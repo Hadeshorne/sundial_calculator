@@ -211,6 +211,22 @@ final class CalculatorViewModel {
         NSPasteboard.general.setString(text, forType: .string)
     }
 
+    func copyExpression() {
+        guard !expression.isEmpty else { return }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(expression, forType: .string)
+    }
+
+    func pasteExpression() {
+        guard let text = NSPasteboard.general.string(forType: .string) else { return }
+        clearExpressionIfError()
+        let allowed = CharacterSet(charactersIn: "0123456789.+-*/^%()√ ")
+        let sanitized = String(text.unicodeScalars.filter { allowed.contains($0) })
+        if !sanitized.isEmpty {
+            expression += sanitized
+        }
+    }
+
     // MARK: - Keyboard Input
 
     func handleKeyPress(_ key: String) {
@@ -322,4 +338,7 @@ enum VisualAnswerType: String, CaseIterable {
     case numberLine = "Number Line"
     case breakdown = "Place Value"
     case proportion = "Proportion"
+    case orderOfMagnitude = "Magnitude"
+    case factorRatio = "Factor"
+    case areaGrid = "Area"
 }

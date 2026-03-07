@@ -24,6 +24,10 @@ struct SundialCalculatorApp: App {
 
                 Button("Copy Result") { viewModel.copyResult() }
                     .keyboardShortcut("c", modifiers: .command)
+                Button("Copy Expression") { viewModel.copyExpression() }
+                    .keyboardShortcut("e", modifiers: [.command, .shift])
+                Button("Paste") { viewModel.pasteExpression() }
+                    .keyboardShortcut("v", modifiers: .command)
 
                 Divider()
 

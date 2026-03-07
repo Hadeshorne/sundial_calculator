@@ -17,7 +17,7 @@ struct VisualAnswerView: View {
                     }
                 }
                 .pickerStyle(.segmented)
-                .frame(width: 280)
+                .frame(maxWidth: .infinity)
                 .accessibilityLabel("Visual answer type")
             }
             .padding(.horizontal, 16)
@@ -37,6 +37,24 @@ struct VisualAnswerView: View {
                     BreakdownView(value: viewModel.lastResult ?? 0)
                 case .proportion:
                     ProportionBarView(
+                        result: viewModel.lastResult ?? 0,
+                        operands: viewModel.lastOperands,
+                        op: viewModel.lastOperator
+                    )
+                case .orderOfMagnitude:
+                    OrderOfMagnitudeView(
+                        result: viewModel.lastResult ?? 0,
+                        operands: viewModel.lastOperands,
+                        op: viewModel.lastOperator
+                    )
+                case .factorRatio:
+                    FactorRatioView(
+                        result: viewModel.lastResult ?? 0,
+                        operands: viewModel.lastOperands,
+                        op: viewModel.lastOperator
+                    )
+                case .areaGrid:
+                    AreaGridView(
                         result: viewModel.lastResult ?? 0,
                         operands: viewModel.lastOperands,
                         op: viewModel.lastOperator

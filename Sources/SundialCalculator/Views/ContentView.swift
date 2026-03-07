@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @Bindable var viewModel: CalculatorViewModel
     @State private var showHistory = true
+    @FocusState private var isFocused: Bool
 
     var body: some View {
         HSplitView {
@@ -17,7 +18,7 @@ struct ContentView: View {
                 if viewModel.showVisualAnswer, viewModel.lastResult != nil {
                     Divider()
                     VisualAnswerView(viewModel: viewModel)
-                        .frame(height: 140)
+                        .frame(minHeight: 140, maxHeight: 180)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
 
@@ -52,6 +53,9 @@ struct ContentView: View {
                 .help("Toggle Visual Answer")
             }
         }
+        .focusable()
+        .focused($isFocused)
+        .onAppear { isFocused = true }
         .onKeyPress(.return) {
             viewModel.evaluate()
             return .handled
