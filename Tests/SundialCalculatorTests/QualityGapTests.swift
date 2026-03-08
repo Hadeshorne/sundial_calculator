@@ -113,7 +113,7 @@ struct ErrorRecoveryOperatorTests {
 
         vm.appendPower()
         #expect(vm.errorMessage == nil)
-        #expect(vm.expression == " ^ ")
+        #expect(vm.expression == "")
     }
 
     @Test("Square root after error clears broken expression")

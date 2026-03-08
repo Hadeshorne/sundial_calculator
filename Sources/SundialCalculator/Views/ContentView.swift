@@ -36,8 +36,7 @@ struct ContentView: View {
                         showHistory.toggle()
                     }
                 } label: {
-                    Image(systemName: showHistory ? "sidebar.left" : "sidebar.left")
-                        .symbolVariant(showHistory ? .none : .none)
+                    Image(systemName: showHistory ? "sidebar.left" : "sidebar.right")
                 }
                 .help("Toggle History Sidebar")
             }

@@ -47,9 +47,9 @@ macOS calculator app for senior executive knowledge workers. Draws on Calculator
 
 ## Phase 7: Tests & Test Plan
 - [x] Unit tests for computation engine (CalculatorEngineTests.swift — 20 tests)
-- [x] User scenario tests (UserScenarioTests.swift — 87 tests across 18 use cases)
+- [x] User scenario tests (UserScenarioTests.swift — 94 tests across 19 use cases)
 - [x] Write comprehensive TEST_PLAN.md
-- [x] All 107 tests pass across 19 suites
+- [x] All 141 tests pass across 26 suites
 
 ## Phase 8: Documentation
 - [x] CLAUDE.md — project guide
@@ -66,10 +66,10 @@ macOS calculator app for senior executive knowledge workers. Draws on Calculator
 - [x] Percent operand extraction — visual answers show resolved percent values (e.g., 10% of 200 = 20)
 - [x] Integer formatting — large integers display as full numbers (1000000 not 1e+06)
 - [x] Quality gap tests (QualityGapTests.swift — 27 tests across 6 suites)
-- [x] All 134 tests pass across 25 suites
+- [x] All 141 tests pass across 26 suites
 
 ## Completion
-All phases complete. App builds and runs with `swift run`. 134 automated tests pass across 25 suites.
+All phases complete. App builds and runs with `swift run`. 141 automated tests pass across 26 suites.
 
 ## Architecture Notes
 - SwiftUI macOS app via Swift Package Manager

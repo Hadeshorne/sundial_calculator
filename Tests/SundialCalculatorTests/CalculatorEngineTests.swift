@@ -89,6 +89,9 @@ struct CalculatorEngineTests {
         #expect(try CalculatorEngine.evaluate("200 + 10%") == 220)
         // 100 − 25% should be 100 − (100 × 25/100) = 75
         #expect(try CalculatorEngine.evaluate("100 − 25%") == 75)
+        // Compound left expression should be used as the base for contextual percent
+        #expect(try CalculatorEngine.evaluate("(100 + 50) + 10%") == 165)
+        #expect(try CalculatorEngine.evaluate("200 × 3 + 10%") == 660)
     }
 
     // MARK: - Error Handling

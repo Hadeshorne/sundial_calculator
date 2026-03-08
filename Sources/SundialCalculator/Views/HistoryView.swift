@@ -37,10 +37,12 @@ struct HistoryView: View {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 2) {
                         ForEach(viewModel.history) { record in
-                            HistoryRow(record: record)
-                                .onTapGesture {
-                                    viewModel.recallFromHistory(record)
-                                }
+                            Button {
+                                viewModel.recallFromHistory(record)
+                            } label: {
+                                HistoryRow(record: record)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                     .padding(.horizontal, 8)

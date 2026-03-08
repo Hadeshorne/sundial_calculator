@@ -182,6 +182,11 @@ struct MemoryTests {
         vm.clear()
         vm.memoryRecall()
         #expect(vm.expression == "100")
+
+        vm.clear()
+        vm.appendCharacter("5")
+        vm.memoryRecall()
+        #expect(vm.expression == "5 × 100")
     }
 
     @Test("M+ accumulates across multiple calculations")
@@ -262,6 +267,12 @@ struct MemoryTests {
         vm.appendCharacter("0")
         vm.evaluate()
         #expect(vm.displayResult == "150")
+
+        vm.clear()
+        vm.appendCharacter("5")
+        vm.appendOperator(.add)
+        vm.memoryRecall()
+        #expect(vm.expression == "5 + 100")
     }
 }
 
@@ -327,6 +338,10 @@ struct ErrorRecoveryTests {
         vm.appendOperator(.add) // expression = "5 + "
         vm.backspace()
         #expect(vm.expression == "5")
+
+        vm.appendOperator(.add)
+        vm.appendOperator(.multiply)
+        #expect(vm.expression == "5 × ")
     }
 
     @Test("Clear resets everything for fresh start")
@@ -970,10 +985,11 @@ struct CopyPasteTests {
         let vm = CalculatorViewModel()
         vm.appendCharacter("1")
         vm.appendCharacter("2")
-        vm.appendOperator(.add)
+        vm.appendOperator(.multiply)
         vm.appendCharacter("3")
-        #expect(vm.expression == "12 + 3")
-        // Verify no crash; pasteboard content tested manually (global resource)
+        vm.appendOperator(.subtract)
+        vm.appendCharacter("4")
+        #expect(vm.expression == "12 × 3 − 4")
         vm.copyExpression()
     }
 
@@ -989,9 +1005,9 @@ struct CopyPasteTests {
     func pasteValid() {
         let vm = CalculatorViewModel()
         NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString("123+456", forType: .string)
+        NSPasteboard.general.setString("123×456−7÷2", forType: .string)
         vm.pasteExpression()
-        #expect(vm.expression == "123+456")
+        #expect(vm.expression == "123×456−7÷2")
     }
 
     @Test("pasteExpression sanitizes invalid characters")

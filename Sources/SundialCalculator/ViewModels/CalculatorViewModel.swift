@@ -38,10 +38,31 @@ final class CalculatorViewModel {
 
     func appendOperator(_ op: Operator) {
         clearExpressionIfError()
-        // If expression is empty and we have a last result, start from it
-        if expression.isEmpty, let last = lastResult {
-            expression = CalculatorEngine.formatResult(last)
+        let trimmed = expression.trimmingCharacters(in: .whitespaces)
+        if trimmed.isEmpty {
+            if let last = lastResult {
+                expression = CalculatorEngine.formatResult(last)
+            } else if op == .subtract {
+                expression = "-"
+                return
+            } else {
+                return
+            }
         }
+
+        if hasTrailingBinaryOperator(expression) {
+            replaceTrailingBinaryOperator(with: op.rawValue)
+            return
+        }
+
+        if let last = lastNonWhitespaceCharacter(in: expression), last == "(" || last == "√" {
+            if op == .subtract {
+                expression += "-"
+            }
+            return
+        }
+
+        guard canAppendBinaryOperator(to: expression) else { return }
         expression += " \(op.rawValue) "
     }
 
@@ -49,7 +70,7 @@ final class CalculatorViewModel {
         clearExpressionIfError()
         if paren == "(" {
             // Add implicit multiply: 5( → 5 × (
-            if let last = expression.last, last.isNumber || last == ")" || last == "%" {
+            if let last = lastNonWhitespaceCharacter(in: expression), last.isNumber || last == ")" || last == "%" {
                 expression += " × "
             }
             expression += "("
@@ -65,6 +86,18 @@ final class CalculatorViewModel {
 
     func appendPower() {
         clearExpressionIfError()
+        let trimmed = expression.trimmingCharacters(in: .whitespaces)
+        if trimmed.isEmpty {
+            guard let last = lastResult else { return }
+            expression = CalculatorEngine.formatResult(last)
+        }
+
+        if hasTrailingBinaryOperator(expression) {
+            replaceTrailingBinaryOperator(with: Operator.power.rawValue)
+            return
+        }
+
+        guard canAppendBinaryOperator(to: expression) else { return }
         expression += " ^ "
     }
 
@@ -182,8 +215,19 @@ final class CalculatorViewModel {
     }
 
     func memoryRecall() {
-        if hasMemory {
-            expression += CalculatorEngine.formatResult(memory)
+        guard hasMemory else { return }
+        clearExpressionIfError()
+
+        let recallText = CalculatorEngine.formatResult(memory)
+        guard !expression.isEmpty else {
+            expression = recallText
+            return
+        }
+
+        if let last = lastNonWhitespaceCharacter(in: expression), last.isNumber || last == ")" || last == "%" {
+            expression += " × \(recallText)"
+        } else {
+            expression += recallText
         }
     }
 
@@ -220,8 +264,13 @@ final class CalculatorViewModel {
     func pasteExpression() {
         guard let text = NSPasteboard.general.string(forType: .string) else { return }
         clearExpressionIfError()
-        let allowed = CharacterSet(charactersIn: "0123456789.+-*/^%()√ ")
-        let sanitized = String(text.unicodeScalars.filter { allowed.contains($0) })
+        let normalized = text
+            .replacingOccurrences(of: "–", with: "-")
+            .replacingOccurrences(of: "—", with: "-")
+            .replacingOccurrences(of: "\n", with: " ")
+            .replacingOccurrences(of: "\t", with: " ")
+        let allowed = CharacterSet(charactersIn: "0123456789.+-−*/×÷^%()√ ")
+        let sanitized = String(normalized.unicodeScalars.filter { allowed.contains($0) })
         if !sanitized.isEmpty {
             expression += sanitized
         }
@@ -271,6 +320,28 @@ final class CalculatorViewModel {
     }
 
     // MARK: - Private Helpers
+
+    private func lastNonWhitespaceCharacter(in text: String) -> Character? {
+        text.trimmingCharacters(in: .whitespaces).last
+    }
+
+    private func hasTrailingBinaryOperator(_ text: String) -> Bool {
+        guard let last = lastNonWhitespaceCharacter(in: text) else { return false }
+        return "+-−×÷*/^".contains(last)
+    }
+
+    private func replaceTrailingBinaryOperator(with symbol: String) {
+        var trimmed = expression.trimmingCharacters(in: .whitespaces)
+        guard let last = trimmed.last, "+-−×÷*/^".contains(last) else { return }
+
+        trimmed.removeLast()
+        expression = trimmed.trimmingCharacters(in: .whitespaces) + " \(symbol) "
+    }
+
+    private func canAppendBinaryOperator(to text: String) -> Bool {
+        guard let last = lastNonWhitespaceCharacter(in: text) else { return false }
+        return last.isNumber || last == "." || last == ")" || last == "%"
+    }
 
     private func extractOperands(from expr: String, result: Double) {
         // Simple extraction for binary operations like "A op B"

@@ -97,10 +97,7 @@ struct NumberLineView: View {
     }
 
     private func formatTick(_ value: Double) -> String {
-        if value == value.rounded() && abs(value) < 1e6 {
-            return String(format: "%.0f", value)
-        }
-        return String(format: "%.1f", value)
+        CalculatorEngine.formatResult(value)
     }
 
     private func numberLineDescription() -> String {

@@ -178,12 +178,13 @@ struct CalculatorEngine {
         let trimmed = input.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { throw EngineError.emptyExpression }
 
-        var tokens = try tokenize(trimmed)
+        let tokens = try tokenize(trimmed)
+        let resolvedTokens = try resolvePercents(tokens)
+        return try evaluateInfixTokens(resolvedTokens)
+    }
 
-        // Handle percent tokens: convert N% to N/100
-        tokens = resolvePercents(tokens)
-
-        // Shunting-yard
+    private static func evaluateInfixTokens(_ tokens: [Token]) throws -> Double {
+        // Shunting-yard (infix -> postfix)
         var output: [Token] = []
         var operatorStack: [Token] = []
 
@@ -279,18 +280,20 @@ struct CalculatorEngine {
     // MARK: - Percent Resolution
 
     /// Converts sequences like `number %` into `number / 100`.
-    /// Handles `A + B%` as `A + (A × B / 100)` for add/subtract contexts.
-    private static func resolvePercents(_ tokens: [Token]) -> [Token] {
+    /// Handles `A + B%` as `A + (A × B / 100)` where `A` is the full
+    /// left-hand expression value before the add/subtract operator.
+    private static func resolvePercents(_ tokens: [Token]) throws -> [Token] {
         var result: [Token] = []
 
         var i = 0
         while i < tokens.count {
             if i + 1 < tokens.count, case .number(let value) = tokens[i], tokens[i + 1] == .percent {
-                // Check context: is there an operator before this number?
-                if let lastOp = findLastOperator(in: result),
-                   (lastOp == .add || lastOp == .subtract),
-                   let baseValue = findBaseValue(in: result) {
-                    // A + B% means A + (A × B / 100)
+                if let opIndex = lastBinaryOperatorIndex(in: result),
+                   case .op(let lastOp) = result[opIndex],
+                   (lastOp == .add || lastOp == .subtract) {
+                    // A + B% means A + (A × B / 100), where A can be compound.
+                    let leftExprTokens = Array(result[..<opIndex])
+                    let baseValue = try evaluateInfixTokens(leftExprTokens)
                     result.append(.number(baseValue * value / 100))
                 } else {
                     // Standalone N% = N / 100
@@ -306,22 +309,10 @@ struct CalculatorEngine {
         return result
     }
 
-    private static func findLastOperator(in tokens: [Token]) -> Operator? {
-        if case .op(let op) = tokens.last {
-            return op
-        }
-        return nil
-    }
-
-    private static func findBaseValue(in tokens: [Token]) -> Double? {
-        // Walk backward past the last operator to find the base number
-        var idx = tokens.count - 1
-        guard idx >= 1 else { return nil }
-        // tokens[idx] should be the operator
-        if case .op = tokens[idx] {
-            idx -= 1
-            if case .number(let val) = tokens[idx] {
-                return val
+    private static func lastBinaryOperatorIndex(in tokens: [Token]) -> Int? {
+        for index in stride(from: tokens.count - 1, through: 0, by: -1) {
+            if case .op = tokens[index] {
+                return index
             }
         }
         return nil

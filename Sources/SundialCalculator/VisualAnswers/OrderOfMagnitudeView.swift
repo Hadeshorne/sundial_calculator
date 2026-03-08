@@ -137,14 +137,7 @@ struct OrderOfMagnitudeView: View {
     }
 
     private func formatValue(_ value: Double) -> String {
-        let absVal = abs(value)
-        let sign = value < 0 ? "-" : ""
-        if absVal == 0 { return "0" }
-        if absVal >= 1e9 { return "\(sign)\(String(format: "%.1f", absVal / 1e9))B" }
-        if absVal >= 1e6 { return "\(sign)\(String(format: "%.1f", absVal / 1e6))M" }
-        if absVal >= 1e3 { return "\(sign)\(String(format: "%.1f", absVal / 1e3))K" }
-        if absVal >= 1 { return "\(sign)\(String(format: "%.10g", value))" }
-        return "\(sign)\(String(format: "%.3g", absVal))"
+        CalculatorEngine.formatResult(value)
     }
 
     private func magnitudeDescription() -> String {

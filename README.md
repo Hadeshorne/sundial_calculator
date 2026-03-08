@@ -54,8 +54,11 @@ Every result includes an optional visual check — choose from six types:
 | Escape | Clear |
 | Delete | Backspace |
 | Cmd+C | Copy result |
+| Cmd+Shift+E | Copy expression |
+| Cmd+V | Paste into expression |
 | Cmd+Shift+V | Toggle visual panel |
 | Cmd+Shift+C | Clear expression |
+| Cmd+Shift+A | All Clear (history + memory) |
 
 ### Accessibility
 - VoiceOver labels on all interactive elements
@@ -104,12 +107,24 @@ swift run    # Launch app for manual testing
 ## Documentation
 
 - [CHEATSHEET.md](CHEATSHEET.md) — User manual for first-time users
+- [CLAUDE.md](CLAUDE.md) — Developer project guide
 - [TEST_PLAN.md](TEST_PLAN.md) — Comprehensive test plan
 - [EXECUTION_PLAN.md](EXECUTION_PLAN.md) — Build execution plan
+- [Calculator_Research.md](Calculator_Research.md) — Montessori-informed design research
+
+## Building a .app Bundle
+
+A convenience script is included to bundle the app as a standalone macOS `.app`:
+
+```bash
+./build-app.sh
+```
+
+This creates `SundialCalculator.app` with a proper `Info.plist` that you can double-click to launch or move to `/Applications`.
 
 ## Future: iOS Version
 
-An iOS version targeting dyscalculia support is planned with interactive manipulatives, Construct mode, and Core Data storage. See `Calculator_Research.md` for the full design specification.
+An iOS version targeting dyscalculia support is planned with interactive manipulatives, Construct mode, and Core Data storage. See [Calculator_Research.md](Calculator_Research.md) for the full design specification.
 
 ## License
 

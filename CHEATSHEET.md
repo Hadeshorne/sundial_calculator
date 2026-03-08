@@ -201,6 +201,8 @@ Beyond the basic typing shortcuts above, the app supports these combinations:
 | Keys to press | What happens |
 |---|---|
 | **Cmd+C** | Copies the answer so you can paste it into other apps |
+| **Cmd+Shift+E** | Copies the current expression (what you've typed so far) |
+| **Cmd+V** | Pastes text from your clipboard into the expression |
 | **Cmd+Shift+C** | Clears the current calculation |
 | **Cmd+Shift+A** | Clears everything — calculation, history, and memory |
 | **Cmd+Shift+V** | Shows or hides the visual answer panel |
@@ -215,7 +217,7 @@ The app adds two menus to your Mac's menu bar at the top of the screen:
 
 **Calculator menu:**
 - Clear, All Clear
-- Copy Result
+- Copy Result, Copy Expression, Paste
 - Toggle Visual Answer
 
 **Memory menu:**
@@ -230,7 +232,7 @@ The app adds two menus to your Mac's menu bar at the top of the screen:
 - **Exponents with ^:** Type **2^10** to get 1024. Great for compound interest — **1000*1.05^10** shows what $1,000 becomes at 5% annual growth over 10 years.
 - **Square root with √:** Click the √ button, type a number, and press Return. Note: the square root of a negative number will show an error.
 - **Percentage shortcut:** Type **200+10%** and the calculator automatically figures out "200 plus 10% of 200" = 220. Works with subtraction too: **200-10%** = 180.
-- **Copy and paste:** Press **Cmd+C** to copy your answer and paste it into a spreadsheet, email, or document.
+- **Copy and paste:** Press **Cmd+C** to copy your answer, or **Cmd+Shift+E** to copy the expression. Press **Cmd+V** to paste a number or expression from another app into the calculator.
 - **Visual sanity check:** If a result seems off, look at the visual panel. A number line or proportion bar can instantly reveal if something is way too big or too small.
 
 ---
