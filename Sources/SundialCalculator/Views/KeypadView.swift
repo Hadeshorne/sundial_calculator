@@ -3,10 +3,61 @@ import SwiftUI
 struct KeypadView: View {
     @Bindable var viewModel: CalculatorViewModel
 
-    private let spacing: CGFloat = 6
+    private var spacing: CGFloat { viewModel.profile.largeText ? 10 : 6 }
+    private var keyHeight: CGFloat { viewModel.profile.largeText ? 52 : 44 }
+    private var memoryHeight: CGFloat { viewModel.profile.largeText ? 40 : 32 }
+    private var digitFontSize: CGFloat { viewModel.profile.largeText ? 24 : 20 }
+    private var functionFontSize: CGFloat { viewModel.profile.largeText ? 18 : 16 }
+    private var memoryFontSize: CGFloat { viewModel.profile.largeText ? 15 : 13 }
 
     var body: some View {
         VStack(spacing: spacing) {
+            HStack(spacing: 8) {
+                Text("Input")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Picker("Input Mode", selection: Binding(
+                    get: { viewModel.inputMode },
+                    set: { viewModel.setInputMode($0) }
+                )) {
+                    ForEach(InputMode.allCases, id: \.self) { mode in
+                        Text(mode.rawValue).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .frame(maxWidth: 260)
+                .accessibilityLabel("Input mode")
+
+                Spacer()
+            }
+
+            if viewModel.inputMode == .guided {
+                VStack(alignment: .leading, spacing: 6) {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 6) {
+                            if viewModel.guidedTokenSlots.isEmpty {
+                                guidedSlot("number", isPlaceholder: true)
+                                guidedSlot("operator", isPlaceholder: true)
+                                guidedSlot("number", isPlaceholder: true)
+                            } else {
+                                ForEach(Array(viewModel.guidedTokenSlots.enumerated()), id: \.offset) { _, token in
+                                    guidedSlot(token, isPlaceholder: false)
+                                }
+                                guidedSlot(viewModel.guidedNextSlotLabel.replacingOccurrences(of: "Next slot: ", with: ""), isPlaceholder: true)
+                            }
+                        }
+                        .padding(.horizontal, 1)
+                    }
+
+                    Text(viewModel.guidedNextSlotLabel)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Guided composer. \(viewModel.guidedNextSlotLabel)")
+            }
+
             // Memory row
             HStack(spacing: spacing) {
                 memoryButton("MC") { viewModel.memoryClear() }
@@ -72,8 +123,8 @@ struct KeypadView: View {
             }
         } label: {
             Text(label)
-                .font(.system(size: 20, weight: .medium, design: .rounded))
-                .frame(maxWidth: .infinity, minHeight: 44)
+                .font(.system(size: digitFontSize, weight: .medium, design: .rounded))
+                .frame(maxWidth: .infinity, minHeight: keyHeight)
         }
         .buttonStyle(CalcButtonStyle(kind: .digit))
         .accessibilityLabel(label == "." ? "Decimal point" : label)
@@ -82,8 +133,8 @@ struct KeypadView: View {
     private func operatorButton(_ label: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(label)
-                .font(.system(size: 20, weight: .semibold, design: .rounded))
-                .frame(maxWidth: .infinity, minHeight: 44)
+                .font(.system(size: digitFontSize, weight: .semibold, design: .rounded))
+                .frame(maxWidth: .infinity, minHeight: keyHeight)
         }
         .buttonStyle(CalcButtonStyle(kind: .operator))
         .accessibilityLabel(operatorAccessibilityLabel(label))
@@ -92,8 +143,8 @@ struct KeypadView: View {
     private func functionButton(_ label: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(label)
-                .font(.system(size: 16, weight: .medium, design: .rounded))
-                .frame(maxWidth: .infinity, minHeight: 44)
+                .font(.system(size: functionFontSize, weight: .medium, design: .rounded))
+                .frame(maxWidth: .infinity, minHeight: keyHeight)
         }
         .buttonStyle(CalcButtonStyle(kind: .function))
         .accessibilityLabel(functionAccessibilityLabel(label))
@@ -102,8 +153,8 @@ struct KeypadView: View {
     private func memoryButton(_ label: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(label)
-                .font(.system(size: 13, weight: .medium, design: .rounded))
-                .frame(maxWidth: .infinity, minHeight: 32)
+                .font(.system(size: memoryFontSize, weight: .medium, design: .rounded))
+                .frame(maxWidth: .infinity, minHeight: memoryHeight)
         }
         .buttonStyle(CalcButtonStyle(kind: .memory))
         .accessibilityLabel(memoryAccessibilityLabel(label))
@@ -112,11 +163,27 @@ struct KeypadView: View {
     private func equalsButton() -> some View {
         Button { viewModel.evaluate() } label: {
             Text("=")
-                .font(.system(size: 22, weight: .bold, design: .rounded))
-                .frame(maxWidth: .infinity, minHeight: 44)
+                .font(.system(size: digitFontSize + 2, weight: .bold, design: .rounded))
+                .frame(maxWidth: .infinity, minHeight: keyHeight)
         }
         .buttonStyle(CalcButtonStyle(kind: .equals))
         .accessibilityLabel("Equals")
+    }
+
+    private func guidedSlot(_ text: String, isPlaceholder: Bool) -> some View {
+        Text(text)
+            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .foregroundStyle(isPlaceholder ? .secondary : .primary)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(
+                Capsule()
+                    .fill(
+                        isPlaceholder
+                            ? Color(.controlBackgroundColor).opacity(0.45)
+                            : Color.accentColor.opacity(0.16)
+                    )
+            )
     }
 
     // MARK: - Accessibility Labels

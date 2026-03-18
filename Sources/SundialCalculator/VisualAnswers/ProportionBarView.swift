@@ -71,8 +71,8 @@ struct ProportionBarView: View {
                             .foregroundStyle(.white)
                     }
             } else {
-                // For multiply/divide, show factor visualization
-                factorDisplay(ops: ops)
+                // For multiply/divide, show scaled comparison bars.
+                factorDisplay(ops: ops, width: width)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
@@ -80,45 +80,41 @@ struct ProportionBarView: View {
     }
 
     @ViewBuilder
-    private func factorDisplay(ops: (left: Double, right: Double)) -> some View {
-        HStack(spacing: 16) {
-            VStack(spacing: 2) {
-                Text(CalculatorEngine.formatResult(ops.left))
-                    .font(.system(size: 16, weight: .medium, design: .monospaced))
-                Rectangle()
-                    .fill(.blue.opacity(0.6))
-                    .frame(width: 60, height: 4)
-                    .clipShape(Capsule())
-            }
+    private func factorDisplay(ops: (left: Double, right: Double), width: CGFloat) -> some View {
+        let leftAbs = abs(ops.left)
+        let rightAbs = abs(ops.right)
+        let larger = max(leftAbs, rightAbs, 1e-15)
+        let ratio = max(leftAbs, rightAbs) / max(min(leftAbs, rightAbs), 1e-15)
+        let barWidth = width * 0.78
 
-            Text(op?.rawValue ?? "")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 8) {
+            comparisonBar(
+                value: ops.left,
+                fraction: leftAbs / larger,
+                color: .blue,
+                width: barWidth
+            )
 
-            VStack(spacing: 2) {
-                Text(CalculatorEngine.formatResult(ops.right))
-                    .font(.system(size: 16, weight: .medium, design: .monospaced))
-                Rectangle()
-                    .fill(.orange.opacity(0.6))
-                    .frame(width: 60, height: 4)
-                    .clipShape(Capsule())
-            }
+            comparisonBar(
+                value: ops.right,
+                fraction: rightAbs / larger,
+                color: .orange,
+                width: barWidth
+            )
 
-            Text("=")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(.secondary)
-
-            VStack(spacing: 2) {
-                Text(CalculatorEngine.formatResult(result))
-                    .font(.system(size: 16, weight: .bold, design: .monospaced))
+            HStack(spacing: 8) {
+                Text(ratioLabel(ratio))
+                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                Text(op?.rawValue ?? "")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.secondary)
+                Text("= \(CalculatorEngine.formatResult(result))")
+                    .font(.system(size: 12, weight: .bold, design: .monospaced))
                     .foregroundStyle(.green)
-                Rectangle()
-                    .fill(.green.opacity(0.6))
-                    .frame(width: 60, height: 4)
-                    .clipShape(Capsule())
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
 
     @ViewBuilder
@@ -166,6 +162,26 @@ struct ProportionBarView: View {
         if normalized <= 2 { return 2 * magnitude }
         if normalized <= 5 { return 5 * magnitude }
         return 10 * magnitude
+    }
+
+    private func comparisonBar(value: Double, fraction: Double, color: Color, width: CGFloat) -> some View {
+        RoundedRectangle(cornerRadius: 6)
+            .fill(color.opacity(0.7))
+            .frame(width: max(6, width * CGFloat(fraction)), height: 26)
+            .overlay(alignment: .leading) {
+                Text(CalculatorEngine.formatResult(value))
+                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .foregroundStyle(.white)
+                    .padding(.leading, 8)
+                    .minimumScaleFactor(0.5)
+            }
+    }
+
+    private func ratioLabel(_ ratio: Double) -> String {
+        if ratio < 100 {
+            return String(format: "%.1fx", ratio)
+        }
+        return String(format: "%.0fx", ratio)
     }
 
     private func proportionDescription() -> String {

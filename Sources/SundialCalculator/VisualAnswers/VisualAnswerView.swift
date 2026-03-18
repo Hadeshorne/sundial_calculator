@@ -12,7 +12,7 @@ struct VisualAnswerView: View {
                     .foregroundStyle(.secondary)
                 Spacer()
                 Picker("", selection: $viewModel.selectedVisualType) {
-                    ForEach(VisualAnswerType.allCases, id: \.self) { type in
+                    ForEach(viewModel.availableVisualTypes, id: \.self) { type in
                         Text(type.rawValue).tag(type)
                     }
                 }
@@ -24,40 +24,83 @@ struct VisualAnswerView: View {
             .padding(.top, 8)
             .padding(.bottom, 4)
 
+            if let recommendation = viewModel.recommendedVisual, !viewModel.profile.reducedVisualComplexity {
+                HStack(alignment: .top, spacing: 8) {
+                    Text("Suggested: \(recommendation.type.rawValue)")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    Text(recommendation.reason)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 4)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Suggested visual: \(recommendation.type.rawValue). \(recommendation.reason)")
+            }
+
+            if viewModel.shouldShowVisualOnboarding {
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: "lightbulb")
+                        .foregroundStyle(.yellow)
+                        .padding(.top, 1)
+
+                    Text(viewModel.visualOnboardingText)
+                        .font(.caption2)
+                        .foregroundStyle(.primary)
+                        .lineLimit(viewModel.profile.reducedVisualComplexity ? 2 : 3)
+
+                    Spacer(minLength: 8)
+
+                    Button("Got it") {
+                        viewModel.markVisualOnboardingSeen()
+                    }
+                    .font(.caption2.weight(.semibold))
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.mini)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.yellow.opacity(0.14))
+                )
+                .padding(.horizontal, 16)
+                .padding(.bottom, 6)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Visual onboarding. \(viewModel.visualOnboardingText)")
+            }
+
             // Visual content
             Group {
                 switch viewModel.selectedVisualType {
                 case .numberLine:
                     NumberLineView(
-                        result: viewModel.lastResult ?? 0,
-                        operands: viewModel.lastOperands,
-                        op: viewModel.lastOperator
+                        result: viewModel.visualResult ?? 0,
+                        operands: viewModel.visualOperands,
+                        op: viewModel.visualOperator
                     )
                 case .breakdown:
-                    BreakdownView(value: viewModel.lastResult ?? 0)
+                    BreakdownView(value: viewModel.visualResult ?? 0)
                 case .proportion:
                     ProportionBarView(
-                        result: viewModel.lastResult ?? 0,
-                        operands: viewModel.lastOperands,
-                        op: viewModel.lastOperator
+                        result: viewModel.visualResult ?? 0,
+                        operands: viewModel.visualOperands,
+                        op: viewModel.visualOperator
                     )
                 case .orderOfMagnitude:
                     OrderOfMagnitudeView(
-                        result: viewModel.lastResult ?? 0,
-                        operands: viewModel.lastOperands,
-                        op: viewModel.lastOperator
-                    )
-                case .factorRatio:
-                    FactorRatioView(
-                        result: viewModel.lastResult ?? 0,
-                        operands: viewModel.lastOperands,
-                        op: viewModel.lastOperator
+                        result: viewModel.visualResult ?? 0,
+                        operands: viewModel.visualOperands,
+                        op: viewModel.visualOperator
                     )
                 case .areaGrid:
                     AreaGridView(
-                        result: viewModel.lastResult ?? 0,
-                        operands: viewModel.lastOperands,
-                        op: viewModel.lastOperator
+                        result: viewModel.visualResult ?? 0,
+                        operands: viewModel.visualOperands,
+                        op: viewModel.visualOperator
                     )
                 }
             }

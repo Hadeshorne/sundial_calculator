@@ -21,6 +21,7 @@ Requires: macOS 14+ and Xcode Command Line Tools (Swift 5.9+).
 
 ### Compute Mode
 - **Expression input** — type full expressions like `(100 + 50) × 2 ÷ 3`
+- **Guided input mode** — optional slot-style flow (`number → operator → number`) with corrective hints
 - **Operator precedence** — correct PEMDAS/BODMAS order of operations
 - **Parentheses** — group sub-expressions
 - **Power** — `5^2` = 25, `1.05^10` ≈ 1.629 (compound interest)
@@ -29,16 +30,22 @@ Requires: macOS 14+ and Xcode Command Line Tools (Swift 5.9+).
 - **Memory** — M+, M−, MR, MC for running totals
 
 ### Visual Answer Panel
-Every result includes an optional visual check — choose from six types:
+Every result includes an optional visual check — the picker narrows to the most relevant three choices for the current calculation:
 - **Number Line** — shows operands and result on a scaled line with jump arcs
-- **Place Value** — decomposes results into thousands, hundreds, tens, ones with color-coded blocks
-- **Proportion** — bar visualization showing how operands compose the result
+- **Place Value** — decomposes results into billions...hundredths with regroup animation states
+- **Proportion** — bar visualization showing composition and multiplicative comparison
 - **Magnitude** — logarithmic scale showing where numbers fall across orders of magnitude
-- **Factor** — side-by-side bars with ratio annotations and percentage change
 - **Area** — grid visualization for multiplication, division, and power operations
+- **Replay step mode** — move backward/forward through order-of-operations and sync visuals per step
+- **Visual onboarding** — first-use helper text per visual type with dismiss/reset support
+
+### Confidence and Personalization
+- **Confidence check strip** — estimate, direction, and sign cues for every result (with complex-expression fallback)
+- **Accessibility profile** — slower replay animation, large text, simplified notation labels, spoken meaning checks, reduced visual complexity
+- **Persistent settings** — profile and onboarding state are saved across launches
 
 ### History Sidebar
-- All calculations saved in session
+- Recent calculations saved across launches
 - Click any entry to recall it
 - Newest first
 
@@ -59,12 +66,17 @@ Every result includes an optional visual check — choose from six types:
 | Cmd+Shift+V | Toggle visual panel |
 | Cmd+Shift+C | Clear expression |
 | Cmd+Shift+A | All Clear (history + memory) |
+| Cmd+[ / Cmd+] | Replay previous/next step |
+| Cmd+Shift+P | Play/Pause replay |
+| Cmd+Shift+R | Reset replay |
+| Cmd+Option+1 / Cmd+Option+2 | Switch Freeform/Guided input mode |
 
 ### Accessibility
 - VoiceOver labels on all interactive elements
 - Full keyboard navigation
 - Dark Mode and Light Mode support
 - High-contrast button styling
+- VoiceOver labels for replay controls, guided composer, confidence strip, and onboarding prompts
 
 ## Design Principles
 
@@ -73,7 +85,7 @@ Grounded in [Montessori-informed design research](Calculator_Research.md):
 - **Visual verification** — every result can be visually checked for magnitude and structure
 - **Cognitive load reduction** — clean UI, progressive disclosure, no clutter
 - **Control of error** — visual answers help catch order-of-magnitude mistakes
-- **Freedom within limits** — choose from 6 visual types, each suited to different operations
+- **Freedom within limits** — the picker narrows to operation-appropriate visual types
 
 ## Architecture
 
@@ -81,18 +93,26 @@ Grounded in [Montessori-informed design research](Calculator_Research.md):
 - MVVM pattern: `CalculatorViewModel` → `CalculatorEngine`
 - Pure Swift computation engine (no UI dependencies, fully unit-tested)
 - Visual renderers are interchangeable SwiftUI views
-- 141 automated tests across 26 suites
+- 167 automated tests across 33 suites
 
 ## Project Structure
 
 ```
 Sources/SundialCalculator/
-├── SundialCalculatorApp.swift      # App entry point
-├── Models/                         # Engine + data models
+├── SundialCalculatorApp.swift      # App entry point, 5 menu groups
+├── Models/                         # Engine, data models, accessibility, traces
+│   ├── CalculatorEngine.swift      # Tokenizer, shunting-yard parser, evaluator
+│   ├── CalculationRecord.swift     # History entry model
+│   ├── AccessibilityProfile.swift  # Persisted accessibility toggles
+│   ├── CalculationFeedback.swift   # Recommendation + explanation models
+│   ├── ComputationStep.swift       # Single replay step
+│   ├── ComputationTrace.swift      # Full computation trace
+│   ├── ConfidenceCheck.swift       # Estimate/direction/sign check
+│   └── PlaceValueModel.swift       # Place value decomposition
 ├── ViewModels/                     # State management
 ├── Views/                          # UI components
-└── VisualAnswers/                  # Visual renderers
-Tests/SundialCalculatorTests/       # 141 automated tests
+└── VisualAnswers/                  # Visual renderers + NumberLineMath
+Tests/SundialCalculatorTests/       # 167 tests across 33 suites
 ```
 
 ## Testing
@@ -100,7 +120,7 @@ Tests/SundialCalculatorTests/       # 141 automated tests
 See [TEST_PLAN.md](TEST_PLAN.md) for the comprehensive test plan.
 
 ```bash
-swift test   # Runs 141 automated tests across 26 suites
+swift test   # Runs 167 automated tests across 33 suites
 swift run    # Launch app for manual testing
 ```
 

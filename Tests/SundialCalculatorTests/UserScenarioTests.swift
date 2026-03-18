@@ -734,6 +734,10 @@ struct VisualAnswerStateTests {
         #expect(vm.lastOperands?.left == 48)
         #expect(vm.lastOperands?.right == 17)
         #expect(vm.lastOperator == .add)
+        #expect(vm.recommendedVisual?.type == .numberLine)
+        #expect(vm.selectedVisualType == .numberLine)
+        #expect(vm.availableVisualTypes == [.numberLine, .breakdown, .proportion])
+        #expect(vm.explanation?.text.contains("started with 48") == true)
     }
 
     @Test("Visual type can be switched")
@@ -767,6 +771,22 @@ struct VisualAnswerStateTests {
         #expect(vm.lastOperands?.left == 12)
         #expect(vm.lastOperands?.right == 5)
         #expect(vm.lastOperator == .multiply)
+        #expect(vm.recommendedVisual?.type == .areaGrid)
+        #expect(vm.selectedVisualType == .areaGrid)
+        #expect(vm.availableVisualTypes == [.areaGrid, .proportion, .orderOfMagnitude])
+        #expect(vm.explanation?.text.contains("groups") == true)
+
+        vm.clear()
+        vm.appendCharacter("2")
+        vm.appendCharacter("0")
+        vm.appendCharacter("0")
+        vm.appendOperator(.add)
+        vm.appendCharacter("1")
+        vm.appendCharacter("0")
+        vm.appendPercent()
+        vm.evaluate()
+        #expect(vm.recommendedVisual?.type == .proportion)
+        #expect(vm.explanation?.text.contains("10%") == true)
     }
 
     @Test("Complex expression clears operand tracking")
@@ -785,6 +805,56 @@ struct VisualAnswerStateTests {
 
         // Should not have simple operands since it's complex
         #expect(vm.lastResult == 45)
+        #expect(vm.lastOperands == nil)
+        #expect(vm.lastOperator == nil)
+        #expect(vm.recommendedVisual?.type == .breakdown)
+        #expect(vm.explanation?.text.contains("evaluates to 45") == true)
+    }
+
+    @Test("Replay state is available after multi-step evaluation")
+    func replayStateAvailable() {
+        let vm = CalculatorViewModel()
+        vm.appendCharacter("2")
+        vm.appendOperator(.add)
+        vm.appendCharacter("3")
+        vm.appendOperator(.multiply)
+        vm.appendCharacter("4")
+        vm.evaluate()
+
+        #expect(vm.canReplay == true)
+        #expect(vm.trace?.steps.count == 2)
+        #expect(vm.currentStepIndex == 1)
+        #expect(vm.visualOperator == .add)
+        #expect(vm.visualResult == 14)
+        #expect(vm.replayStepDescription?.contains("Step 2 of 2") == true)
+    }
+
+    @Test("Replay controls navigate steps")
+    func replayControlsNavigate() {
+        let vm = CalculatorViewModel()
+        vm.appendParenthesis("(")
+        vm.appendCharacter("2")
+        vm.appendOperator(.add)
+        vm.appendCharacter("3")
+        vm.appendParenthesis(")")
+        vm.appendOperator(.multiply)
+        vm.appendCharacter("4")
+        vm.evaluate()
+
+        vm.replayReset()
+        #expect(vm.currentStepIndex == 0)
+        #expect(vm.visualOperator == .add)
+        #expect(vm.visualResult == 5)
+
+        vm.replayNext()
+        #expect(vm.currentStepIndex == 1)
+        #expect(vm.visualOperator == .multiply)
+        #expect(vm.visualResult == 20)
+
+        vm.toggleReplay()
+        #expect(vm.isReplayPlaying == true)
+        vm.toggleReplay()
+        #expect(vm.isReplayPlaying == false)
     }
 }
 

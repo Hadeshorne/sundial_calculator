@@ -175,15 +175,25 @@ struct CalculatorEngine {
     // MARK: - Shunting-Yard → Evaluate
 
     static func evaluate(_ input: String) throws -> Double {
+        let trace = try evaluateWithTrace(input)
+        return trace.finalResult
+    }
+
+    static func evaluateWithTrace(_ input: String) throws -> ComputationTrace {
         let trimmed = input.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { throw EngineError.emptyExpression }
 
         let tokens = try tokenize(trimmed)
         let resolvedTokens = try resolvePercents(tokens)
-        return try evaluateInfixTokens(resolvedTokens)
+        let evaluated = try evaluateInfixTokens(resolvedTokens, includeTrace: true)
+        return ComputationTrace(
+            expression: trimmed,
+            steps: evaluated.steps,
+            finalResult: evaluated.result
+        )
     }
 
-    private static func evaluateInfixTokens(_ tokens: [Token]) throws -> Double {
+    private static func evaluateInfixTokens(_ tokens: [Token], includeTrace: Bool) throws -> (result: Double, steps: [ComputationStep]) {
         // Shunting-yard (infix -> postfix)
         var output: [Token] = []
         var operatorStack: [Token] = []
@@ -238,6 +248,8 @@ struct CalculatorEngine {
 
         // Evaluate postfix
         var evalStack: [Double] = []
+        var steps: [ComputationStep] = []
+        var stepID = 0
 
         for token in output {
             switch token {
@@ -256,6 +268,18 @@ struct CalculatorEngine {
                     throw EngineError.undefinedResult
                 }
                 evalStack.append(result)
+                if includeTrace {
+                    steps.append(
+                        ComputationStep(
+                            id: stepID,
+                            left: a,
+                            right: b,
+                            op: op,
+                            result: result
+                        )
+                    )
+                    stepID += 1
+                }
             case .unaryOp(let op):
                 guard !evalStack.isEmpty else {
                     throw EngineError.invalidExpression
@@ -274,7 +298,7 @@ struct CalculatorEngine {
             throw EngineError.invalidExpression
         }
 
-        return evalStack[0]
+        return (result: evalStack[0], steps: steps)
     }
 
     // MARK: - Percent Resolution
@@ -293,7 +317,7 @@ struct CalculatorEngine {
                    (lastOp == .add || lastOp == .subtract) {
                     // A + B% means A + (A × B / 100), where A can be compound.
                     let leftExprTokens = Array(result[..<opIndex])
-                    let baseValue = try evaluateInfixTokens(leftExprTokens)
+                    let baseValue = try evaluateInfixTokens(leftExprTokens, includeTrace: false).result
                     result.append(.number(baseValue * value / 100))
                 } else {
                     // Standalone N% = N / 100

@@ -4,8 +4,8 @@
 
 This test plan covers the Sundial Calculator macOS app: a dual-output calculator for senior executive knowledge workers. Tests are organized by component and priority. Each test has a unique ID, verifiable expected outcome, and pass/fail criteria.
 
-**Automated**: 141 tests across 26 suites (Swift Testing framework)
-**Manual**: 73 test cases across 8 sections
+**Automated**: 167 tests across 33 suites (Swift Testing framework)
+**Manual**: 101 test cases across 9 sections
 
 ## How to Run
 
@@ -13,7 +13,7 @@ This test plan covers the Sundial Calculator macOS app: a dual-output calculator
 ```bash
 swift test
 ```
-All tests in `Tests/SundialCalculatorTests/` run automatically. Three test files cover the computation engine, ViewModel workflows, and quality gap regressions.
+All tests in `Tests/SundialCalculatorTests/` run automatically. The suite covers the engine, user scenarios, quality-gap regressions, replay math, guided input, confidence checks, accessibility profile persistence, and history persistence.
 
 ### Manual Tests
 Launch the app with `swift run` and execute each test case. Mark Pass/Fail in the tables below.
@@ -131,12 +131,13 @@ Launch the app with `swift run` and execute each test case. Mark Pass/Fail in th
 | HI-04 | Recall from history | Click a history entry | Expression and result populate from that entry | |
 | HI-05 | Clear history | Click "Clear" in history header | All entries removed, empty state shows | |
 | HI-06 | Toggle sidebar | Click sidebar toggle button in toolbar | History sidebar hides/shows | |
+| HI-07 | History persists across relaunch | Evaluate 2 calculations, quit app, relaunch with `swift run` | Recent history entries reappear in the same order | |
 
 ---
 
 ## 4. UI — Visual Answer Panel (Manual)
 
-Six visual answer types: Number Line, Place Value Breakdown, Proportion Bar, Order of Magnitude, Factor Ratio, Area Grid.
+Five visual answer types: Number Line, Place Value Breakdown, Proportion Bar, Order of Magnitude, Area Grid. The picker narrows to the most relevant choices for the current calculation.
 
 | ID | Test | Procedure | Expected Outcome | Pass/Fail |
 |----|-------|-----------|-------------------|-----------|
@@ -145,7 +146,7 @@ Six visual answer types: Number Line, Place Value Breakdown, Proportion Bar, Ord
 | VA-03 | Place Value Breakdown | Select "Place Value", evaluate "1234 + 1" | Breakdown shows 1000 + 200 + 30 + 5 = 1235 | |
 | VA-04 | Proportion Bar | Select "Proportion", evaluate "50 + 50" | Bar chart shows two segments composing 100 | |
 | VA-05 | Order of Magnitude | Select "Order of Magnitude", evaluate "500 × 200" | Logarithmic scale showing result magnitude | |
-| VA-06 | Factor Ratio | Select "Factor Ratio", evaluate "12 × 5" | Factor/ratio comparison bars for operands | |
+| VA-06 | Context-aware picker | Evaluate "48 + 17", then "12 × 5" | Add/sub view offers Number Line, Place Value, Proportion; multiply view offers Area, Proportion, Magnitude | |
 | VA-07 | Area Grid | Select "Area Grid", evaluate "6 × 8" | Grid visualization showing 6×8=48 | |
 | VA-08 | Toggle visual panel | Click chart icon in toolbar (or Cmd+Shift+V) | Visual panel hides/shows | |
 | VA-09 | Visual updates on new calc | Evaluate "5 + 3", then "10 × 2" | Visual updates to show new result | |
@@ -232,14 +233,14 @@ Six visual answer types: Number Line, Place Value Breakdown, Proportion Bar, Ord
 | VR-02 | Button colors | Inspect keypad | Digits: neutral, Operators: orange, Equals: blue | |
 | VR-03 | History empty state | Launch fresh | Centered "No calculations yet" text | |
 | VR-04 | Display alignment | Enter expression and result | Expression right-aligned, result right-aligned below | |
-| VR-05 | Visual answer sizing | Toggle all 6 visual types | Each fills panel without overflow or underflow | |
+| VR-05 | Visual answer sizing | Toggle all 5 visual types | Each fills panel without overflow or underflow | |
 | VR-06 | Memory indicator | M+ a value | "M:" indicator appears in correct position | |
 
 ---
 
 ## 10. Automated User Scenario Tests (`UserScenarioTests.swift`)
 
-94 automated tests across 19 use-case suites. Each test simulates real button-press / keyboard sequences through the ViewModel.
+96 automated tests across 19 use-case suites. Each test simulates real button-press / keyboard sequences through the ViewModel.
 
 | Suite | Tests | What it covers |
 |-------|-------|----------------|
@@ -255,7 +256,7 @@ Six visual answer types: Number Line, Place Value Breakdown, Proportion Bar, Ord
 | UC10: Decimal Precision | 5 | Currency amounts, double-decimal guard, leading decimal, decimal after operator |
 | UC11: Toggle Sign | 2 | Profit/loss switching (result and expression) |
 | UC12: Complex Expressions | 4 | Nested parens, multiple paren groups, implicit multiply, deep nesting |
-| UC13: Visual Answer State | 5 | Operand tracking, type switching, panel toggle, multiply operands, complex-expr operands |
+| UC13: Visual Answer State | 7 | Operand tracking, type switching, panel toggle, multiply operands, complex-expr operands, replay state, replay controls |
 | UC14: Edge Cases | 8 | Empty eval, repeated =, division by zero, mismatched parens, long expr, negative, zero, ×0 |
 | UC15: Copy Result | 3 | State verification: result ready, expression ready, empty state |
 | UC16: Formatting | 3 | Integer, decimal, scientific notation display |
@@ -280,24 +281,66 @@ Six visual answer types: Number Line, Place Value Breakdown, Proportion Bar, Ord
 
 ---
 
+## 12. Dyscalculia Milestones 2-7 Coverage
+
+These tests were added for replay, dyscalculia-first visuals, guided input, personalization, and confidence/onboarding flows.
+
+### 12.1 Automated Additions
+
+| Suite | File | Tests | Coverage |
+|-------|------|-------|----------|
+| Computation Trace | `ComputationTraceTests.swift` | 4 | Step capture order, parentheses sequencing, summary text, no-step expressions |
+| Number Line Math | `NumberLineMathTests.swift` | 4 | Zero anchor inclusion, tick ordering, axis mapping |
+| Place Value Model | `PlaceValueModelTests.swift` | 3 | Decimal decomposition, negative contributions, place labels |
+| Guided Input | `GuidedInputTests.swift` | 4 | Guided blocking rules, guided flow completion, token slot structure |
+| Confidence Check | `ConfidenceCheckTests.swift` | 3 | Estimate/direction/sign cues and complex-expression fallback |
+| Accessibility Profile | `AccessibilityProfileTests.swift` | 3 | Runtime toggles, persistence across instances, onboarding lifecycle |
+
+### 12.2 Manual Additions
+
+| ID | Test | Procedure | Expected Outcome | Pass/Fail |
+|----|------|-----------|------------------|-----------|
+| DX-01 | Replay controls appear for multi-step expressions | Evaluate `2 + 3 × 4` | Replay bar appears with Previous/Play/Next/Reset controls | |
+| DX-02 | Replay step caption updates | Step through replay on `(2 + 3) × 4` | Caption changes from step 1 to step 2 with correct summaries | |
+| DX-03 | Number line zero anchor | Evaluate `120 + 30` and `-30 + 10` | Number line includes a visible zero anchor in both cases | |
+| DX-04 | Place value decimals | Evaluate `12.3 + 0.8` | Breakdown shows tenths/hundredths where applicable | |
+| DX-05 | Guided mode slot strip | Switch to Guided mode and start entering an expression | Token slots render and next-slot hint updates as you type | |
+| DX-06 | Guided invalid close parenthesis | In Guided mode, press `)` first | Expression is not modified and corrective hint appears | |
+| DX-07 | Guided invalid digit-after-percent | In Guided mode, enter `20%` then press `5` | Extra digit is blocked and hint asks for an operator | |
+| DX-08 | Accessibility menu toggles | Toggle each Accessibility menu item | UI behavior updates live without restart | |
+| DX-09 | Large text profile | Enable Large Text | Display and keypad controls enlarge with no clipping | |
+| DX-10 | Reduced visual complexity | Enable Reduced Visual Complexity | Secondary visual text is reduced while core result info remains visible | |
+| DX-11 | Confidence strip on complex expression | Evaluate `(10 + 5) × 3` | Confidence strip appears with fallback rounded check | |
+| DX-12 | Visual onboarding reset | Dismiss onboarding, then use Accessibility > Replay visual onboarding | Onboarding prompts appear again for each visual type | |
+
+---
+
 ## Test Summary
 
 | Category | File | Tests | Type |
 |----------|------|-------|------|
 | Engine | `CalculatorEngineTests.swift` | 20 | Automated |
-| User Scenarios | `UserScenarioTests.swift` | 94 | Automated |
+| User Scenarios | `UserScenarioTests.swift` | 96 | Automated |
 | Quality Gaps | `QualityGapTests.swift` | 27 | Automated |
-| **Automated Total** | | **141** | |
+| Computation Trace | `ComputationTraceTests.swift` | 4 | Automated |
+| Number Line Math | `NumberLineMathTests.swift` | 4 | Automated |
+| Place Value Model | `PlaceValueModelTests.swift` | 3 | Automated |
+| Guided Input | `GuidedInputTests.swift` | 4 | Automated |
+| Confidence Check | `ConfidenceCheckTests.swift` | 3 | Automated |
+| Accessibility Profile | `AccessibilityProfileTests.swift` | 3 | Automated |
+| History Persistence | `HistoryPersistenceTests.swift` | 3 | Automated |
+| **Automated Total** | | **167** | |
 | UI Display & Input | Manual | 23 | Manual |
-| History Sidebar | Manual | 6 | Manual |
+| History Sidebar | Manual | 7 | Manual |
 | Visual Answer Panel | Manual | 12 | Manual |
 | Memory Functions | Manual | 7 | Manual |
 | Keyboard Shortcuts | Manual | 13 | Manual |
 | Accessibility | Manual | 8 | Manual |
 | Edge Cases | Manual | 13 | Manual |
 | Visual Regression | Manual | 6 | Manual |
-| **Manual Total** | | **88** | |
-| **Grand Total** | | **229** | |
+| Dyscalculia Milestones 2-7 | Manual | 12 | Manual |
+| **Manual Total** | | **101** | |
+| **Grand Total** | | **268** | |
 
 ---
 
@@ -308,6 +351,8 @@ Six visual answer types: Number Line, Place Value Breakdown, Proportion Bar, Ord
 | 2026-03-05 | 107 | 107 | 0 | All 19 suites pass (initial build) |
 | 2026-03-05 | 134 | 134 | 0 | All 25 suites pass (quality hardening + UC19) |
 | 2026-03-07 | 141 | 141 | 0 | All 26 suites pass (verified, test plan updated) |
+| 2026-03-08 | 164 | 164 | 0 | Milestones 2-8 complete: replay, guided mode, profile, confidence/onboarding suites added |
+| 2026-03-10 | 167 | 167 | 0 | Context-aware visual picker, persisted history, and five-visual baseline verified |
 
 ---
 
@@ -318,7 +363,7 @@ cd /Users/andydup/Downloads/Development/Sundial_Calculator
 swift test
 ```
 
-Expected: **141 tests across 26 suites**, all pass.
+Expected: **167 tests across 33 suites**, all pass.
 
 To run a specific suite:
 ```bash
@@ -331,6 +376,6 @@ swift test --filter "QG1"
 
 After any code change:
 1. Run `swift build` to verify compilation
-2. Run `swift test` to verify all 141 automated tests pass
+2. Run `swift test` to verify all 167 automated tests pass
 3. Run `swift run` and execute relevant manual tests from sections 2–9
 4. Update the tracking table above

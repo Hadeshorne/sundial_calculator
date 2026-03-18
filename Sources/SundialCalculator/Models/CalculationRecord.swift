@@ -1,6 +1,6 @@
 import Foundation
 
-struct CalculationRecord: Identifiable, Equatable {
+struct CalculationRecord: Identifiable, Equatable, Codable {
     let id: UUID
     let expression: String
     let result: Double

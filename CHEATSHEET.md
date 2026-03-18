@@ -89,6 +89,15 @@ Just type your math problem. For example, type **5+3** and then press the **Retu
 
 Click the number and operator buttons on the keypad, then click the **=** button.
 
+### Input Modes
+
+Sundial has two input modes:
+
+- **Freeform** — type naturally like a standard calculator.
+- **Guided** — shows token slots and nudges you through `number -> operator -> number`, which helps prevent syntax mistakes.
+
+Switch modes from the keypad selector or from the **Input** menu in the menu bar.
+
 ### Available Operations
 
 | What you want to do | What to type on your keyboard | What to click on the keypad |
@@ -135,21 +144,40 @@ If you see an error message, just start typing a new number or press Escape — 
 
 After every calculation, a picture of your answer appears below the result. This is the feature that makes Sundial Calculator different from ordinary calculators — it gives you a quick visual check.
 
-### Six Types of Pictures
+### Five Types of Pictures
 
-You can switch between six views by clicking the selector above the picture:
+The selector above the picture narrows to the three most relevant views for the current calculation:
 
 1. **Number Line** — Places your numbers as dots on a line with an arc showing the operation. Best for addition and subtraction — you can see the "jump" between numbers.
 
 2. **Place Value** — Breaks your answer into thousands, hundreds, tens, and ones using color-coded blocks. Helpful for understanding large numbers at a glance.
 
-3. **Proportion** — Shows your numbers as colored bars next to each other. Helpful for seeing how big one number is compared to another.
+3. **Proportion** — Shows your numbers as colored bars next to each other. Helpful for seeing how big one number is compared to another and for comparing multiplicative changes.
 
 4. **Magnitude** — A logarithmic scale showing where your numbers fall across orders of magnitude (1, 10, 100, 1K, etc.). Helpful for understanding very large or very small numbers and seeing how far apart two numbers are on a grand scale.
 
-5. **Factor** — Shows operands as side-by-side bars with a ratio annotation. For addition and subtraction, highlights the change amount and percentage. Helpful for seeing how numbers relate to each other proportionally.
+5. **Area** — Displays multiplication, division, and power results as a grid of cells where columns and rows represent the operands. Helpful for visualizing what "5 times 8" actually looks like as an area.
 
-6. **Area** — Displays multiplication, division, and power results as a grid of cells where columns and rows represent the operands. Helpful for visualizing what "5 times 8" actually looks like as an area.
+### Replaying the Solution (Step by Step)
+
+For multi-step expressions, replay controls appear below the display:
+
+- **Previous** — go to the prior order-of-operations step
+- **Play/Pause** — animate each step in sequence
+- **Next** — move to the next step
+- **Reset** — return to step 1
+
+The visual panel updates as you replay each step, so you can verify where each intermediate result came from.
+
+### Confidence Check Strip
+
+After each result, Sundial shows quick confidence cues:
+
+- A rough estimate check
+- A direction check (larger/smaller/equal trend)
+- A sign check (positive/negative/zero)
+
+Use this strip to catch order-of-magnitude mistakes before trusting the final number.
 
 ### Hiding the Visual Panel
 
@@ -163,6 +191,7 @@ Every calculation you perform is saved in the sidebar on the left.
 
 - The most recent calculation appears at the top.
 - Click any past calculation to bring it back into the display.
+- Your recent calculations are restored the next time you launch the app.
 - Click **Clear** at the top of the history list to erase all history.
 
 ### Hiding the History Sidebar
@@ -206,6 +235,12 @@ Beyond the basic typing shortcuts above, the app supports these combinations:
 | **Cmd+Shift+C** | Clears the current calculation |
 | **Cmd+Shift+A** | Clears everything — calculation, history, and memory |
 | **Cmd+Shift+V** | Shows or hides the visual answer panel |
+| **Cmd+[** | Replay previous step |
+| **Cmd+]** | Replay next step |
+| **Cmd+Shift+P** | Play/Pause replay |
+| **Cmd+Shift+R** | Reset replay |
+| **Cmd+Option+1** | Switch to Freeform mode |
+| **Cmd+Option+2** | Switch to Guided mode |
 
 (The **Cmd** key is the one with the ⌘ symbol, next to the spacebar.)
 
@@ -213,7 +248,7 @@ Beyond the basic typing shortcuts above, the app supports these combinations:
 
 ## Menu Bar
 
-The app adds two menus to your Mac's menu bar at the top of the screen:
+The app adds several menus to your Mac's menu bar at the top of the screen:
 
 **Calculator menu:**
 - Clear, All Clear
@@ -222,6 +257,20 @@ The app adds two menus to your Mac's menu bar at the top of the screen:
 
 **Memory menu:**
 - Memory Add, Subtract, Recall, Clear
+
+**Replay menu:**
+- Previous Step, Play/Pause, Next Step, Reset Replay
+
+**Input menu:**
+- Freeform / Guided mode switching
+
+**Accessibility menu:**
+- Slower replay animation
+- Large text
+- Simplified notation labels
+- Spoken meaning checks
+- Reduced visual complexity
+- Replay visual onboarding
 
 ---
 
@@ -234,6 +283,8 @@ The app adds two menus to your Mac's menu bar at the top of the screen:
 - **Percentage shortcut:** Type **200+10%** and the calculator automatically figures out "200 plus 10% of 200" = 220. Works with subtraction too: **200-10%** = 180.
 - **Copy and paste:** Press **Cmd+C** to copy your answer, or **Cmd+Shift+E** to copy the expression. Press **Cmd+V** to paste a number or expression from another app into the calculator.
 - **Visual sanity check:** If a result seems off, look at the visual panel. A number line or proportion bar can instantly reveal if something is way too big or too small.
+- **Use Guided mode when tired or rushed:** It reduces syntax slips by blocking common expression mistakes.
+- **Use replay for complex expressions:** Step through `(a + b) × c` style calculations and confirm each intermediate result.
 
 ---
 
